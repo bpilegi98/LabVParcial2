@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.PostConstruct;
@@ -22,8 +23,14 @@ public class IntegrationComponent {
                 .build();
     }
 
-    public ResponseEntity getLineNumberAndReceivedCalls(String lineNumber)
+    public ResponseEntity getLineNumberAndReceivedCalls(String lineNumber) throws RestClientException
     {
-        return rest.getForEntity(url + "call/lineNumberAndReceivedCalls/"+lineNumber, String.class);
+        try {
+            return rest.getForEntity(url + "call/lineNumberAndReceivedCalls/" + lineNumber, String.class);
+        }
+        catch (RestClientException res)
+        {
+            return ResponseEntity.badRequest().body(res.getMessage());
+        }
     }
 }
